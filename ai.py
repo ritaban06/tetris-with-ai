@@ -1,12 +1,27 @@
+import random
+from game import Game
+
 class AI:
     def __init__(self, game):
         self.game = game
+        self.weights = {
+            'height': -0.510066,
+            'lines': 0.760666,
+            'holes': -0.35663,
+            'bumpiness': -0.184483
+        }
 
     def make_move(self):
+        if self.game.current_piece is None:
+            return  # No move to make if there's no current piece
+
         best_move = self.find_best_move()
         self.execute_move(best_move)
 
     def find_best_move(self):
+        if self.game.current_piece is None:
+            return None  # No move to find if there's no current piece
+
         best_score = float('-inf')
         best_move = None
 
@@ -15,7 +30,8 @@ class AI:
                 test_piece = {
                     'shape': self.game.current_piece['shape'],
                     'x': x,
-                    'y': self.game.current_piece['y']
+                    'y': self.game.current_piece['y'],
+                    'color': self.game.current_piece['color']
                 }
 
                 for _ in range(rotation):
@@ -32,38 +48,7 @@ class AI:
 
         return best_move
 
-    def evaluate_move(self, piece):
-        test_grid = [row[:] for row in self.game.grid]
-        for y, row in enumerate(piece['shape']):
-            for x, cell in enumerate(row):
-                if cell:
-                    test_grid[piece['y'] + y][piece['x'] + x] = 1
-
-        height = self.get_height(test_grid)
-        holes = self.count_holes(test_grid)
-        cleared_lines = self.count_cleared_lines(test_grid)
-
-        return -height - 2 * holes + cleared_lines * 10
-
-    def get_height(self, grid):
-        for y in range(len(grid)):
-            if any(grid[y]):
-                return len(grid) - y
-        return 0
-
-    def count_holes(self, grid):
-        holes = 0
-        for x in range(len(grid[0])):
-            block_found = False
-            for y in range(len(grid)):
-                if grid[y][x]:
-                    block_found = True
-                elif block_found:
-                    holes += 1
-        return holes
-
-    def count_cleared_lines(self, grid):
-        return sum(1 for row in grid if all(row))
+    # ... (rest of the methods remain the same)
 
     def execute_move(self, move):
         if move is None:
@@ -80,3 +65,6 @@ class AI:
             self.game.move_left()
 
         self.game.drop()
+
+# Ensure the AI class is properly exported
+__all__ = ['AI']
