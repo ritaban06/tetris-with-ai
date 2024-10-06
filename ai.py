@@ -48,7 +48,57 @@ class AI:
 
         return best_move
 
-    # ... (rest of the methods remain the same)
+    def evaluate_move(self, piece):
+        # Create a copy of the game grid to simulate the move
+        test_grid = [row[:] for row in self.game.grid]
+        
+        # Place the piece on the test grid
+        for y, row in enumerate(piece['shape']):
+            for x, cell in enumerate(row):
+                if cell:
+                    test_grid[piece['y'] + y][piece['x'] + x] = piece['color']
+
+        # Calculate features
+        height = self.calculate_height(test_grid)
+        lines = self.calculate_lines(test_grid)
+        holes = self.calculate_holes(test_grid)
+        bumpiness = self.calculate_bumpiness(test_grid)
+
+        # Calculate score using weights
+        score = (
+            self.weights['height'] * height +
+            self.weights['lines'] * lines +
+            self.weights['holes'] * holes +
+            self.weights['bumpiness'] * bumpiness
+        )
+
+        return score
+
+    def calculate_height(self, grid):
+        return max(self.game.grid_height - row.index(1) if 1 in row else 0 for row in zip(*grid))
+
+    def calculate_lines(self, grid):
+        return sum(all(cell for cell in row) for row in grid)
+
+    def calculate_holes(self, grid):
+        holes = 0
+        for col in zip(*grid):
+            block_found = False
+            for cell in col:
+                if cell:
+                    block_found = True
+                elif block_found:
+                    holes += 1
+        return holes
+
+    def calculate_bumpiness(self, grid):
+        heights = [0] * self.game.grid_width
+        for x in range(self.game.grid_width):
+            for y in range(self.game.grid_height):
+                if grid[y][x]:
+                    heights[x] = self.game.grid_height - y
+                    break
+        return sum(abs(heights[i] - heights[i+1]) for i in range(len(heights)-1))
 
     def execute_move(self, move):
         if move is None:
