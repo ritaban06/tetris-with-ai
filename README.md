@@ -1,3 +1,7 @@
+![GitHub repo size](https://img.shields.io/github/repo-size/ritaban06/tetris-with-ai)  
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Markdown](https://img.shields.io/badge/Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white)
+
 # AI Tetris
 
 This project implements an AI-powered Tetris game using Python and Pygame. The AI agent uses a weighted scoring system to make decisions about piece placement.
